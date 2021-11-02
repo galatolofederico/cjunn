@@ -207,10 +207,12 @@ def get_default_args():
         plot_network_tmp="/tmp/plot-network-tmp",
         log_tensorboard=False,
         log_wandb=False,
+        pruning=0,
+        prune=False,
+        lottery_ticket=False,
         wandb_project="cjunn",
         wandb_entity="mlpi",
         wandb_log_results=False,
-        prune=False
     )
 
 
