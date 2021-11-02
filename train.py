@@ -48,7 +48,7 @@ def get_datasets(config):
     ))
 
 
-def get_model(config):
+def get_model(config, args):
     if config.model.name == "cjunn":
         return CombinedJointUNNClassifierModel(
             config,
@@ -94,7 +94,7 @@ def run_train(config, args, datasets, loggers):
     config.model.hyperparameters.outputs = config.dataset.classes
     config.model.hyperparameters.pruning = args.pruning
     
-    model = get_model(config)
+    model = get_model(config, args)
     callbacks = get_callbacks(config, args)
     
     trainer = pl.Trainer(gpus=args.gpus, max_epochs=config.dataset.max_epochs, logger=loggers, callbacks=callbacks)

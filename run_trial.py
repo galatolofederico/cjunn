@@ -4,8 +4,8 @@ import argparse
 import os
 
 from src.utils import Namespace
-from configs import configs
-from train_classifier import train, get_default_args
+from configs import datasets, models
+from train import train, get_default_args
 
 def sample_params(trial):
     patience = trial.suggest_int("patience", 5, 50)
@@ -39,24 +39,7 @@ def sample_params(trial):
                 lr=lr,
             )
         )
-    elif config["model"]["name"] == "mnn":
-        hidden  = trial.suggest_int("hidden", 1, 50)
-        pruning  = trial.suggest_uniform("pruning", 0, 1)
-        ticks  = trial.suggest_int("ticks", 1, 5)
-        lr = trial.suggest_loguniform("lr", 1e-4, 1e-1)
-
-        return dict(
-            args=dict(
-                patience=patience
-            ),
-            config=dict(
-                hidden=hidden,
-                pruning = pruning,
-                ticks = ticks,
-                lr=lr,
-            )
-        )
-    
+  
     else:
         raise Exception("Unknown model: '%s'" % (config.model.name, ))
 
@@ -76,8 +59,11 @@ def objective(trial):
 
     trial_args = get_default_args()
     trial_args.patience = hyperparameters["args"]["patience"]
-    trial_args.log_wandb = True
-    trial_args.wandb_log_results = True
+    trial_args.log_wandb = args.wandb
+    trial_args.wandb_log_results = args.wandb
+    trial_args.pruning = args.pruning
+    trial_args.prune = args.prune
+    trial_args.lottery_ticket = args.lottery_ticket
 
     results = train(trial_config, trial_args, args.optuna_replicas)
     return results["results/validation/accuracy/mean"]
@@ -86,11 +72,16 @@ def objective(trial):
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--study-name", type=str, required=True)
+parser.add_argument("--wandb", action="store_true")
 
 args = parser.parse_args()
 
 study = optuna.load_study(study_name=args.study_name, storage=os.environ["OPTUNA_STORAGE"])
 vars(args).update(study.user_attrs["args"])
-config = configs[args.config]
+
+config = dict(
+    dataset=datasets[args.dataset],
+    model=models[args.model]
+)
 
 study.optimize(objective, n_trials=1)
