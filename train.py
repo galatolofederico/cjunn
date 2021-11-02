@@ -13,7 +13,6 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 from src.models.cjunn.classifier import CombinedJointUNNClassifierModel
 from src.models.cjunn.earlystop import CombinedJointUNNEarlyStopping
-from src.models.mnn.classifier import MNNClassifierModel
 from src.models.mlp.classifier import MLPClassifierModel
 
 
@@ -57,8 +56,6 @@ def get_model(config):
             plot_network_each=args.plot_network_each,
             plot_network_tmp=args.plot_network_tmp
         )
-    elif config.model.name == "mnn":
-        return MNNClassifierModel(config)
     elif config.model.name == "mlp":
         return MLPClassifierModel(config)
     else:
@@ -69,15 +66,6 @@ def get_callbacks(config, args):
     callbacks = []
     if config.model.name == "cjunn":
         early_stop_callback = CombinedJointUNNEarlyStopping(
-            monitor="validation/epoch_loss",
-            min_delta=0.00,
-            patience=args.patience,
-            verbose=False,
-            mode="min"
-        )
-        callbacks.append(early_stop_callback)
-    elif config.model.name == "mnn":
-        early_stop_callback = EarlyStopping(
             monitor="validation/epoch_loss",
             min_delta=0.00,
             patience=args.patience,
