@@ -9,7 +9,6 @@ __pycache__/
 
 /wandb
 /checkpoints
-/self-boosted
 
 /plots
 /.plotszoo-wandb-cache
@@ -18,5 +17,3 @@ __pycache__/
 /plots.bak
 
 /tmp
-
-/self-boosted-*
