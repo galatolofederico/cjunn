@@ -12,7 +12,8 @@ from src.visualizer import Visualizer
 class CombinedJointUNNClassifierModel(AbstractClassifier):
     def __init__(self, config, plot_network=False, plot_network_each=None, plot_network_tmp=None):
         super(CombinedJointUNNClassifierModel, self).__init__()
-        self.hparams = config
+        self.save_hyperparameters(config)
+        
         self.plot_network = plot_network
         self.plot_network_each = plot_network_each
         self.plot_network_tmp = plot_network_tmp
