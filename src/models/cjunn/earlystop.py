@@ -5,7 +5,8 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 class CombinedJointUNNEarlyStopping(EarlyStopping):
     def _run_early_stopping_check(self, trainer):
         logs = trainer.callback_metrics
-        num_networks = trainer.model.model.networks
+        model = trainer.model.model
+        num_networks = model.networks
         
         if trainer.fast_dev_run or not self._validate_condition_metric(logs):
             return
@@ -18,10 +19,10 @@ class CombinedJointUNNEarlyStopping(EarlyStopping):
         should_stop = trainer.training_type_plugin.reduce_boolean_decision(should_stop)
         trainer.should_stop = trainer.should_stop or should_stop
 
-        if should_stop and num_networks > 1:
+        if trainer.should_stop and num_networks > 1:
             trainer.model.model.selection()
             self.wait_count = 0
-            should_stop = False
+            trainer.should_stop = False
 
         if should_stop:
             self.stopped_epoch = trainer.current_epoch
