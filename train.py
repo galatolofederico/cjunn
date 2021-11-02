@@ -2,6 +2,7 @@ import torch
 import argparse
 import numpy as np
 import os
+import json
 
 from sklearn import datasets as skdatasets
 from sklearn.model_selection import train_test_split
@@ -124,9 +125,15 @@ def run_train(config, args, datasets, loggers):
         trainer = pl.Trainer(gpus=args.gpus, max_epochs=config.dataset.max_epochs, logger=loggers, callbacks=callbacks)
         trainer.fit(model, datasets.train, datasets.validation)
     
-    train_report = trainer.test(model, datasets.train)[0]
-    validation_report = trainer.test(model, datasets.validation)[0]
-    test_report = trainer.test(model, datasets.test)[0]
+    trainer.test(model, datasets.train)
+    train_report = trainer.model.test_report
+    
+    trainer.test(model, datasets.validation)
+    validation_report = trainer.model.test_report
+
+    trainer.test(model, datasets.test)
+    test_report = trainer.model.test_report
+
 
     return dict(
         model = model, 
@@ -146,7 +153,11 @@ def train(config, args, replicas=None):
         loggers.append(pl.loggers.WandbLogger(project=args.wandb_project, entity=args.wandb_entity))
 
     if replicas is None:
-        return run_train(config, args, datasets, loggers)
+        train_results = run_train(config, args, datasets, loggers)
+        reports = train_results["reports"]
+        
+        reports["parameters"] = train_results["model"].model.get_trainable_parameters_number()
+        print(json.dumps(reports, indent=4))
     else:
         results = dict(
             train = dict(
@@ -181,7 +192,6 @@ def train(config, args, replicas=None):
         
         if args.wandb_log_results:
             import wandb    
-            import json
             reports_filename = os.path.join("/tmp", "%s_reports.json" % (wandb.run.id))
             reports_file = open(reports_filename, "w")
             json.dump(all_reports, reports_file)

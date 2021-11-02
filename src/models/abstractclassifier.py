@@ -18,8 +18,8 @@ class AbstractClassifier(pl.LightningModule):
     def test_epoch_end(self, outputs):
         rights = np.concatenate([output["rights"] for output in outputs])
         predictions = np.concatenate([output["predictions"] for output in outputs])
-
-        return classification_report(rights, predictions, output_dict=True, zero_division=0)
+        self.test_report = classification_report(rights, predictions, output_dict=True, zero_division=0)
+        return self.test_report
     
     def validation_step(self, batch, batch_idx):
         X, y = batch
