@@ -49,7 +49,7 @@ def get_datasets(config):
 
 
 def get_model(config):
-    if config.model.name == "self-boosted":
+    if config.model.name == "cjunn":
         return CombinedJointUNNClassifierModel(
             config,
             plot_network=args.plot_network,
@@ -66,7 +66,7 @@ def get_model(config):
 
 def get_callbacks(config, args):
     callbacks = []
-    if config.model.name == "self-boosted":
+    if config.model.name == "cjunn":
         early_stop_callback = CombinedJointUNNEarlyStopping(
             monitor="validation/epoch_loss",
             min_delta=0.00,
@@ -208,7 +208,7 @@ def get_default_args():
         plot_network_tmp="/tmp/plot-network-tmp",
         log_tensorboard=False,
         log_wandb=False,
-        wandb_project="self-boosted",
+        wandb_project="cjunn",
         wandb_entity="mlpi",
         wandb_log_results=False,
         prune=False

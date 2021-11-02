@@ -114,10 +114,9 @@ datasets = dict(
     ),
 )
 
-
 models = dict(
-    sb = dict(
-        name = "self-boosted",
+    cjunn = dict(
+        name = "cjunn",
         hyperparameters = dict(
             hidden = 5,
             max_incoming_connections = 10,
@@ -153,47 +152,47 @@ models = dict(
 configs = dict(
     cjunn_iris = dict(
         dataset = datasets["iris"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_credit=dict(
         dataset = datasets["credit"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_transfusion=dict(
         dataset = datasets["transfusion"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_monks=dict(
         dataset = datasets["monks"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_tictactoe=dict(
         dataset = datasets["tictactoe"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_plates=dict(
         dataset = datasets["plates"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_krkp=dict(
         dataset = datasets["krkp"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_qsar=dict(
         dataset = datasets["qsar"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_nursery=dict(
         dataset = datasets["nursery"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_robot=dict(
         dataset = datasets["robot"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
     cjunn_seeds=dict(
         dataset = datasets["seeds"],
-        model = models["sb"]
+        model = models["cjunn"]
     ),
 
     mnn_iris = dict(

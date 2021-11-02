@@ -9,7 +9,7 @@ from train_classifier import train, get_default_args
 
 def sample_params(trial):
     patience = trial.suggest_int("patience", 5, 50)
-    if config["model"]["name"] == "self-boosted":
+    if config["model"]["name"] == "cjunn":
         hidden = trial.suggest_int("hidden", 1, 10)
         max_incoming_connections = trial.suggest_int("max_incoming_connections", 1, 20)
         lr = trial.suggest_loguniform("lr", 1e-4, 1e-1)
