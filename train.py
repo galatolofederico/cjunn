@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import os
 
-from sklearn import datasets
+from sklearn import datasets as skdatasets
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -17,11 +17,11 @@ from src.models.mlp.classifier import MLPClassifierModel
 
 
 from src.utils import Namespace
-from configs import configs
+from configs import datasets, models
 
 
 def get_datasets(config):
-    X, y = datasets.fetch_openml(config.dataset.name, return_X_y=True, as_frame=False, version=config.dataset.version if hasattr(config.dataset, "version") else "active")
+    X, y = skdatasets.fetch_openml(config.dataset.name, return_X_y=True, as_frame=False, version=config.dataset.version if hasattr(config.dataset, "version") else "active")
     classes = np.unique(y).tolist()
     y = np.array([classes.index(i) for i in y])
 
@@ -103,6 +103,7 @@ def get_callbacks(config, args):
 def run_train(config, args, datasets, loggers):    
     config.model.hyperparameters.inputs = config.dataset.features
     config.model.hyperparameters.outputs = config.dataset.classes
+    config.model.hyperparameters.pruning = args.pruning
     
     model = get_model(config)
     callbacks = get_callbacks(config, args)
@@ -114,7 +115,7 @@ def run_train(config, args, datasets, loggers):
     if args.prune:
         prune_mask = model.prune()
     
-    if args.retrain:
+    if args.lottery_ticket:
         callbacks = get_callbacks(config, args)
         
         model.reinit()
@@ -219,7 +220,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     defaults = get_default_args()
 
-    parser.add_argument("--config", type=str, choices=list(configs.keys()), required=True)
+    parser.add_argument("--model", type=str, choices=list(models.keys()), required=True)
+    parser.add_argument("--dataset", type=str, choices=list(datasets.keys()), required=True)
+    
+    parser.add_argument("--prune", action="store_true")
+    parser.add_argument("--pruning", type=float, default=0)
+    parser.add_argument("--lottery-ticket", action="store_true")
+
     parser.add_argument("--gpus", type=int, default=defaults.gpus)
     parser.add_argument("--patience", type=int, default=defaults.patience)
 
@@ -239,5 +246,8 @@ if __name__ == "__main__":
     if not os.path.exists(args.plot_network_tmp):
         os.mkdir(args.plot_network_tmp)
 
-    config = Namespace(configs[args.config])
+    config = Namespace(dict(
+        model=models[args.model],
+        dataset=datasets[args.dataset]
+    ))
     train(config, args)
