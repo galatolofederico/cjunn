@@ -101,7 +101,7 @@ def run_train(config, args, datasets, loggers):
     
     trainer.fit(model, datasets.train, datasets.validation)
     
-    if args.prune:
+    if args.prune or args.lottery_ticket:
         prune_mask = model.prune()
     
     if args.lottery_ticket:
