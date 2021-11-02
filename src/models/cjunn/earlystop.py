@@ -3,29 +3,31 @@ import torch
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 class CombinedJointUNNEarlyStopping(EarlyStopping):
-    def _run_early_stopping_check(self, trainer, pl_module):
-        logs = trainer.logger_connector.callback_metrics
+    def _run_early_stopping_check(self, trainer):
+        logs = trainer.callback_metrics
         num_networks = trainer.model.model.networks
+        
+        if trainer.fast_dev_run or not self._validate_condition_metric(logs):
+            return
 
         current = logs.get(self.monitor)
+
         trainer.dev_debugger.track_early_stopping_history(self, current)
 
-        if not isinstance(current, torch.Tensor):
-            current = torch.tensor(current, device=pl_module.device)
+        should_stop, reason = self._evaluate_stopping_criteria(current)
+        should_stop = trainer.training_type_plugin.reduce_boolean_decision(should_stop)
+        trainer.should_stop = trainer.should_stop or should_stop
 
-        if self.monitor_op(current - self.min_delta, self.best_score):
-            self.best_score = current
+        if should_stop and num_networks > 1:
+            trainer.model.model.selection()
             self.wait_count = 0
-        else:
-            self.wait_count += 1
-            should_stop = self.wait_count >= self.patience and num_networks == 1
-            if num_networks > 1:
-                trainer.model.model.selection()
-                self.wait_count = 0
+            should_stop = False
 
-            if bool(should_stop):
-                self.stopped_epoch = trainer.current_epoch
-                trainer.should_stop = True
+        if should_stop:
+            self.stopped_epoch = trainer.current_epoch
+        if reason and self.verbose:
+            self._log_info(trainer, reason)
 
-        should_stop = trainer.accelerator_backend.early_stopping_should_stop(pl_module)
-        trainer.should_stop = should_stop
+
+        
+
