@@ -77,7 +77,6 @@ class CombinedJointUNNModel(torch.nn.Module):
             incoming_values = torch.gather(postsynaptic.clone(), 2, incoming_indices_batch)
             incoming_weights = self.W[incoming_indices, node]
 
-            #outgoing_values = contract("ijk,jk->ij", incoming_values, incoming_weights)
             outgoing_values = incoming_weights * incoming_values
             outgoing_values = outgoing_values.sum(dim=2)
 
