@@ -3,9 +3,9 @@ import numpy as np
 import time
 import copy
 
-class MLPModel(torch.nn.Module):
+class MLP2Model(torch.nn.Module):
     def __init__(self, inputs, hidden, outputs, activation=torch.nn.functional.leaky_relu, seed=None, pruning=None):
-        super(MLPModel, self).__init__()
+        super(MLP2Model, self).__init__()
         self.inputs = inputs
         self.hidden = hidden
         self.outputs = outputs

@@ -5,14 +5,14 @@ import pytorch_lightning as pl
 from sklearn.metrics import classification_report
 
 from src.models.abstractclassifier import AbstractClassifier
-from src.models.mlp.model import MLPModel
+from src.models.mlp2.model import MLP2Model
 
-class MLPClassifierModel(AbstractClassifier):
+class MLP2ClassifierModel(AbstractClassifier):
     def __init__(self, config):
-        super(MLPClassifierModel, self).__init__()
+        super(MLP2ClassifierModel, self).__init__()
         self.save_hyperparameters(config) 
 
-        self.model = MLPModel(
+        self.model = MLP2Model(
             inputs=config.model.hyperparameters.inputs,
             hidden=config.model.hyperparameters.hidden,
             outputs=config.model.hyperparameters.outputs,
@@ -44,7 +44,7 @@ class MLPClassifierModel(AbstractClassifier):
         if hasattr(self.model, "backward"):
             return self.model.backward(*args, **kwargs)
         else:
-            return super(MLPClassifierModel, self).backward(*args, **kwargs)
+            return super(MLP2ClassifierModel, self).backward(*args, **kwargs)
 
     def prune(self, *args, **kwargs):
         self.model.prune(*args, **kwargs)

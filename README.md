@@ -36,7 +36,7 @@ To train a model run
 python train.py --model <model> --dataset <dataset> (--prune --pruning <level>) (--lottery-ticket --pruning <level>)
 ```
 
-Available models are `cjunn` and `mlp`. Available datasets are `iris`, `credit`, `transfusion`, `monks`, `tictactoe`, `plates`, `krkp`, `qsar`, `nursery`, `robot` and `seeds`. The pruning level must be between 0 and 1.
+Available models are `cjunn`, `mlp2` and `mlp4`. Available datasets are `iris`, `credit`, `transfusion`, `monks`, `tictactoe`, `plates`, `krkp`, `qsar`, `nursery`, `robot` and `seeds`. The pruning level must be between 0 and 1.
 
 To prune a model after train add the flag `--prune` and specify the pruning level with `--pruning <level>`.
 
