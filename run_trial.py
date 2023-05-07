@@ -26,7 +26,7 @@ def sample_params(trial):
                 mutation_entropy=mutation_entropy
             )
         )
-    elif config["model"]["name"] == "mlp2" or config["model"]["name"] == "mlp4":
+    elif config["model"]["name"] == "mlp2" or config["model"]["name"] == "mlp3" or config["model"]["name"] == "mlp4":
         hidden  = trial.suggest_int("hidden", 1, 50)
         lr = trial.suggest_loguniform("lr", 1e-4, 1e-1)
 
