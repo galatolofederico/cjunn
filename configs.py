@@ -136,6 +136,14 @@ models = dict(
             lr = .01,
         )
     ),
+    mlp3 = dict(
+        name = "mlp3",
+        hyperparameters = dict(
+            hidden = 10,
+            activation = torch.nn.functional.leaky_relu,
+            lr = .01,
+        )
+    ),
     mlp4 = dict(
         name = "mlp4",
         hyperparameters = dict(

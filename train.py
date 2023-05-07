@@ -14,6 +14,7 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from src.models.cjunn.classifier import CombinedJointUNNClassifierModel
 from src.models.cjunn.earlystop import CombinedJointUNNEarlyStopping
 from src.models.mlp2.classifier import MLP2ClassifierModel
+from src.models.mlp3.classifier import MLP3ClassifierModel
 from src.models.mlp4.classifier import MLP4ClassifierModel
 
 
@@ -59,6 +60,8 @@ def get_model(config, args):
         )
     elif config.model.name == "mlp2":
         return MLP2ClassifierModel(config)
+    elif config.model.name == "mlp3":
+        return MLP3ClassifierModel(config)    
     elif config.model.name == "mlp4":
         return MLP4ClassifierModel(config)
     else:
@@ -76,7 +79,7 @@ def get_callbacks(config, args):
             mode="min"
         )
         callbacks.append(early_stop_callback)
-    elif config.model.name == "mlp2" or config.model.name == "mlp4":
+    elif config.model.name == "mlp2" or config.model.name == "mlp3" or config.model.name == "mlp4":
         early_stop_callback = EarlyStopping(
             monitor="validation/epoch_loss",
             min_delta=0.00,
