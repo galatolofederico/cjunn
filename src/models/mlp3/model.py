@@ -71,8 +71,8 @@ class MLP3Model(torch.nn.Module):
         self.hidden2_to_hidden3.weight.data = self.hidden2_to_hidden3.weight.data*self.hidden2_to_hidden3_weight_mask
         self.hidden2_to_hidden3.bias.data = self.hidden2_to_hidden3.bias.data*self.hidden2_to_hidden3_bias_mask
 
-        self.hidden3_to_out.weight.data = self.hidden4_to_out.weight.data*self.hidden3_to_out_weight_mask
-        self.hidden3_to_out.bias.data = self.hidden4_to_out.bias.data*self.hidden3_to_out_bias_mask
+        self.hidden3_to_out.weight.data = self.hidden3_to_out.weight.data*self.hidden3_to_out_weight_mask
+        self.hidden3_to_out.bias.data = self.hidden3_to_out.bias.data*self.hidden3_to_out_bias_mask
 
         self.pruned = True
     
