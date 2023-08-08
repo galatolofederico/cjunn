@@ -61,6 +61,7 @@ def objective(trial):
     trial_args.patience = hyperparameters["args"]["patience"]
     trial_args.log_wandb = args.wandb
     trial_args.wandb_log_results = args.wandb
+    trial_args.compute_stats = True
     trial_args.pruning = args.pruning
     trial_args.prune = args.prune
     trial_args.lottery_ticket = args.lottery_ticket

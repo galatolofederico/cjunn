@@ -121,6 +121,13 @@ def run_train(config, args, datasets, loggers):
         trainer = pl.Trainer(gpus=args.gpus, max_epochs=config.dataset.max_epochs, logger=loggers, callbacks=callbacks)
         trainer.fit(model, datasets.train, datasets.validation)
     
+    if args.compute_stats:
+        last_stats = model.visualizer.compute_stats()
+
+        print("=== Last path stats === ")
+        print(last_stats)
+        print("===")
+    
     trainer.test(model, datasets.train)
     train_report = trainer.model.test_report
     
