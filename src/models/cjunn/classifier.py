@@ -10,7 +10,7 @@ from src.models.cjunn.model import CombinedJointUNNModel
 from src.visualizer import Visualizer
 
 class CombinedJointUNNClassifierModel(AbstractClassifier):
-    def __init__(self, config, plot_network=False, plot_network_each=None, plot_network_tmp=None, compute_stats=False):
+    def __init__(self, config, plot_network=False, plot_network_each=None, plot_network_tmp=None, compute_stats=False, compute_stats_each=None):
         super(CombinedJointUNNClassifierModel, self).__init__()
         self.save_hyperparameters(config)
         
@@ -19,6 +19,7 @@ class CombinedJointUNNClassifierModel(AbstractClassifier):
         self.plot_network_tmp = plot_network_tmp
 
         self.compute_stats = compute_stats
+        self.compute_stats_each = compute_stats_each
 
         self.model = CombinedJointUNNModel(
             inputs=config.model.hyperparameters.inputs,
@@ -33,6 +34,12 @@ class CombinedJointUNNClassifierModel(AbstractClassifier):
         self.loss_fn = torch.nn.CrossEntropyLoss()
         if self.plot_network or self.compute_stats:
             self.visualizer = Visualizer(self.model)
+            self.last_stats = dict(
+                mean_path_length=0,
+                std_path_length=0,
+                min_path_length=0,
+                max_path_length=0,
+            )
 
         self.training_step_number = 0
         self.mutation_runs = 0
@@ -70,5 +77,13 @@ class CombinedJointUNNClassifierModel(AbstractClassifier):
         self.log("misc/max_weight", self.model.get_networks_weights().max())
         self.log("misc/min_weight", self.model.get_networks_weights().min())
         self.log("misc/mutation_runs", self.mutation_runs, prog_bar=True)
+
+        if self.compute_stats and self.global_step % self.compute_stats_each == 0:
+            self.last_stats = self.visualizer.compute_stats()
+
+        self.log("stats/mean_path_length", self.last_stats["mean_path_length"], prog_bar=True)
+        self.log("stats/std_path_length", self.last_stats["std_path_length"])
+        self.log("stats/max_path_length", self.last_stats["max_path_length"])
+        self.log("stats/min_path_length", self.last_stats["min_path_length"])
 
         return loss

@@ -93,4 +93,21 @@ class Visualizer:
                     if f != self.model.zero_bias:
                         self.G.add_edge(f, self.model.inputs+node, weight=norm_weights[f, node], alpha=(1 - network_weight) if self.model.networks > 1 else 1)
       
-        print(self.G)
+        io_paths = dict()
+        for input_node in range(0, self.model.inputs):
+            for output_node in range(self.model.inputs + self.model.hidden, self.model.inputs + self.model.hidden + self.model.outputs):
+                if input_node != self.model.zero_bias:
+                    paths = nx.all_simple_paths(self.G, source=input_node, target=output_node)
+                    io_paths[(input_node, output_node)] = [len(path) for path in paths]
+        
+        paths = []
+        for k, v in io_paths.items():
+            paths.extend(v)
+        paths = np.array(paths)
+        
+        return dict(
+            mean_path_length=float(np.mean(paths)),
+            std_path_length=float(np.std(paths)),
+            max_path_length=float(np.max(paths)),
+            min_path_length=float(np.min(paths)),
+        )
