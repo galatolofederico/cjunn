@@ -3,6 +3,9 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
+import matplotlib
+matplotlib.use('Agg')
+
 class Visualizer:
     def __init__(self, model):
         self.model = model
