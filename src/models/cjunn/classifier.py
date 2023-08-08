@@ -10,13 +10,15 @@ from src.models.cjunn.model import CombinedJointUNNModel
 from src.visualizer import Visualizer
 
 class CombinedJointUNNClassifierModel(AbstractClassifier):
-    def __init__(self, config, plot_network=False, plot_network_each=None, plot_network_tmp=None):
+    def __init__(self, config, plot_network=False, plot_network_each=None, plot_network_tmp=None, compute_stats=False):
         super(CombinedJointUNNClassifierModel, self).__init__()
         self.save_hyperparameters(config)
         
         self.plot_network = plot_network
         self.plot_network_each = plot_network_each
         self.plot_network_tmp = plot_network_tmp
+
+        self.compute_stats = compute_stats
 
         self.model = CombinedJointUNNModel(
             inputs=config.model.hyperparameters.inputs,
@@ -29,7 +31,7 @@ class CombinedJointUNNClassifierModel(AbstractClassifier):
             activation_th=config.model.hyperparameters.activation_th
         )
         self.loss_fn = torch.nn.CrossEntropyLoss()
-        if self.plot_network:
+        if self.plot_network or self.compute_stats:
             self.visualizer = Visualizer(self.model)
 
         self.training_step_number = 0

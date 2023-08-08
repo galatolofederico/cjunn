@@ -54,6 +54,7 @@ def get_model(config, args):
     if config.model.name == "cjunn":
         return CombinedJointUNNClassifierModel(
             config,
+            compute_stats=args.compute_stats,
             plot_network=args.plot_network,
             plot_network_each=args.plot_network_each,
             plot_network_tmp=args.plot_network_tmp
@@ -211,6 +212,7 @@ def get_default_args():
         plot_network=False,
         plot_network_each=50,
         plot_network_tmp="/tmp/plot-network-tmp",
+        compute_stats=False,
         log_tensorboard=False,
         log_wandb=False,
         pruning=0,
@@ -239,6 +241,8 @@ if __name__ == "__main__":
     parser.add_argument("--plot-network", action="store_true", default=defaults.plot_network)
     parser.add_argument("--plot-network-each", type=int, default=defaults.plot_network_each)
     parser.add_argument("--plot-network-tmp", type=str, default=defaults.plot_network_tmp)
+
+    parser.add_argument("--compute-stats", action="store_true", default=defaults.compute_stats)
     
     parser.add_argument("--log-tensorboard", action="store_true", default=defaults.log_tensorboard)
     parser.add_argument("--log-wandb", action="store_true", default=defaults.log_wandb)

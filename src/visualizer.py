@@ -77,3 +77,20 @@ class Visualizer:
         )
 
         plt.savefig(file)
+
+
+    def compute_stats(self):
+        W = self.model.W.detach().cpu().numpy()
+        norm_weights = (W - W.min()) / (W.max() - W.min())
+        network_weights = self.model.get_networks_weights().detach().cpu().numpy()
+        networks_connections = self.model.connections.detach().cpu().numpy()
+        
+        self.clear()
+        for connections, network_weight in zip(networks_connections, network_weights):
+            for node in range(0, self.model.hidden+self.model.outputs):
+                incoming_connections = connections[node]
+                for f in incoming_connections:
+                    if f != self.model.zero_bias:
+                        self.G.add_edge(f, self.model.inputs+node, weight=norm_weights[f, node], alpha=(1 - network_weight) if self.model.networks > 1 else 1)
+      
+        print(self.G)
