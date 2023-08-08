@@ -123,10 +123,6 @@ def run_train(config, args, datasets, loggers):
     
     if args.compute_stats:
         last_stats = model.visualizer.compute_stats()
-
-        print("=== Last path stats === ")
-        print(last_stats)
-        print("===")
     
     trainer.test(model, datasets.train)
     train_report = trainer.model.test_report
@@ -137,14 +133,14 @@ def run_train(config, args, datasets, loggers):
     trainer.test(model, datasets.test)
     test_report = trainer.model.test_report
 
-
     return dict(
         model = model, 
         reports = dict(
             train = train_report,
             validation = validation_report,
             test = test_report
-        )
+        ),
+        stats=last_stats if args.compute_stats else None
     )
 
 def train(config, args, replicas=None):
@@ -160,6 +156,7 @@ def train(config, args, replicas=None):
         reports = train_results["reports"]
         
         reports["parameters"] = train_results["model"].model.get_trainable_parameters_number()
+        reports["stats"] = train_results["stats"]
         print(json.dumps(reports, indent=4))
     else:
         results = dict(
@@ -174,6 +171,12 @@ def train(config, args, replicas=None):
             ),
             topology = dict(
                 parameters=np.zeros(replicas).tolist(),
+            ),
+            stats=dict(
+                mean_path_length=np.zeros(replicas).tolist(),
+                std_path_length=np.zeros(replicas).tolist(),
+                min_path_length=np.zeros(replicas).tolist(),
+                max_path_length=np.zeros(replicas).tolist(),
             )
         )
         all_reports = list()
@@ -185,6 +188,12 @@ def train(config, args, replicas=None):
             results["test"]["accuracy"][i] = train_results["reports"]["test"]["accuracy"]
             results["topology"]["parameters"][i] = train_results["model"].model.get_trainable_parameters_number()
 
+            if args.compute_stats:
+                results["stats"]["mean_path_length"][i] = train_results["stats"]["mean_path_length"]
+                results["stats"]["std_path_length"][i] = train_results["stats"]["std_path_length"]
+                results["stats"]["min_path_length"][i] = train_results["stats"]["min_path_length"]
+                results["stats"]["max_path_length"][i] = train_results["stats"]["max_path_length"]
+
             all_reports.append(train_results["reports"])
             
         results_stats = dict()
@@ -193,6 +202,14 @@ def train(config, args, replicas=None):
                 results_stats["results/%s/%s/mean" % (group, metric)] = np.mean(results[group][metric])
                 results_stats["results/%s/%s/std" % (group, metric)] = np.std(results[group][metric])
         
+        print("=== RESULTS STATS ===")
+        print(json.dumps(results_stats, indent=4))
+        print("=== RESULTS ===")
+        print(json.dumps(results, indent=4))
+        print("=== REPORTS ===")
+        print(json.dumps(all_reports, indent=4))
+        print(" === END ===")
+
         if args.wandb_log_results:
             import wandb    
             reports_filename = os.path.join("/tmp", "%s_reports.json" % (wandb.run.id))
