@@ -34,7 +34,6 @@ class Visualizer:
 
     def clear(self):
         self.G.clear()
-        plt.close()
         activation_entropy = self.model.get_activation_entropy().mean(axis=0)
         activation_entropy = (activation_entropy - activation_entropy.min()) / (activation_entropy.max() - activation_entropy.min())
         for i in range(0, self.model.inputs+self.model.hidden+self.model.outputs):
@@ -44,7 +43,6 @@ class Visualizer:
                 alpha = activation_entropy[i-self.model.inputs]
             if i != self.model.zero_bias:
                 self.G.add_node(i, alpha=alpha)
-        plt.figure()
 
     def save(self, file):
         W = self.model.W.detach().cpu().numpy()
@@ -70,6 +68,7 @@ class Visualizer:
         edge_color = [(0, 0, 0, a) for a in edges_alphas]
         node_color = [(0.3, 0.6, 0.9, a) for a in nodes_alphas]
         
+        fig = plt.figure()
         nx.draw(
             self.G,
             self.pos,
@@ -80,6 +79,7 @@ class Visualizer:
         )
 
         plt.savefig(file)
+        plt.close(fig)
 
 
     def compute_stats(self):
